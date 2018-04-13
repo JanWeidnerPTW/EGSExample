@@ -1,0 +1,119 @@
+:start geometry definition:
+    :start geometry:    
+        name = outer
+        box size = 2 2 2
+        :start media input:        
+            media = AL521ICRU
+        :stop media input:
+        library = egs_box
+        type = EGS_Box
+    :stop geometry:
+    :start geometry:    
+        name = phantom
+        box size = 500 500 500
+        :start media input:        
+            media = AIR521ICRU
+        :stop media input:
+        library = egs_box
+        type = EGS_Box
+    :stop geometry:
+    :start geometry:    
+        name = inner
+        box size = 1.0 1.0 1.0
+        :start media input:        
+            media = SI521ICRU
+	:stop media input:
+        library = egs_box
+        type = EGS_Box
+    :stop geometry:
+    :start geometry:    
+        name = env
+        base geometry = outer
+        inscribed geometries = inner
+        library = egs_genvelope
+    :stop geometry:
+    :start geometry:    
+        name = GESAMT
+        base geometry = phantom
+        inscribed geometries = env
+        library = egs_genvelope
+    :stop geometry:
+    simulation geometry = GESAMT
+
+:stop geometry definition:
+
+
+:start source definition:
+    :start source:
+        library = egs_parallel_beam
+        name = my_parallel_source
+        :start shape:
+            library = egs_rectangle
+            rectangle = -5 -5 5 5
+        :stop shape:
+        direction = 0 0 -1
+        charge = 0
+        :start spectrum:
+            type = monoenergetic
+            energy = 1.0
+        :stop spectrum:
+    :stop source:
+    :start source:
+        library = egs_transformed_source
+        name = my_source
+        source name = my_parallel_source
+        :start transformation:
+            translation = 0 -10 10
+        :stop transformation:
+    :stop source:
+
+    simulation source = my_source
+
+:stop source definition:
+
+:start rng definition:
+
+  type = ranmar
+  initial seeds = 97 42
+
+:stop rng definition:
+
+:start run control:
+	ncase = 10000
+:stop run control:
+
+:start MC transport parameter:
+
+    # Global ECUT = 1.5
+    Global PCUT = 0.1
+
+:stop MC transport parameter:
+
+:start scoring options:
+    :start calculation geometry:
+	geometry name = GESAMT
+	cavity regions = 0
+	cavity mass = 1
+	cavity geometry = env
+    :stop calculation geometry:
+
+    :start calculation geometry:
+	geometry name = GESAMT
+	cavity regions = 2
+	cavity mass = 1
+	cavity geometry = env
+    :stop calculation geometry:
+:stop scoring options:
+
+:start ausgab object definition:
+
+    :start ausgab object:
+
+        library = egs_track_scoring
+        score photons   = yes
+        score electrons = yes
+        score positrons = yes
+
+    :stop ausgab object:
+
+:stop ausgab object definition:
